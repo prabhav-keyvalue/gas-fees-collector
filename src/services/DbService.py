@@ -1,55 +1,42 @@
-import sqlite3
+from datetime import datetime
 import uuid
-
 from util.Singleton import Singleton
 
 class DbService(metaclass=Singleton):
 
     def __init__(self):
-        self.conn = sqlite3.connect(':memory:')
-        self.cursor = self.conn.cursor()
-        with self.conn:
-            self.cursor.execute("""CREATE TABLE IF NOT EXISTS gas_fees (
-                                    id TEXT NOT NULL PRIMARY KEY,
-                                    source TEXT NOT NULL,
-                                    low_price REAL NOT NULL,
-                                    average_price REAL NOT NULL,
-                                    high_price REAL NOT NULL,
-                                    created_at TEXT NOT NULL
-                                    )
-                                """)
+        self._db = []
+        self._fields = ['low_price', 'average_price', 'high_price']
+
     
     def save_gas_fees(self, gas_fees_data):
-        id = str(uuid.uuid4())
-        gas_fees_data =  {**gas_fees_data, 'id': id}
-        print(f'Saving gas fees data {gas_fees_data} to db')
-        try:
-            with self.conn:
-                self.cursor.execute("""INSERT INTO gas_fees VALUES (
-                                        :id, 
-                                        :source, 
-                                        :low_price, 
-                                        :average_price, 
-                                        :high_price,
-                                        datetime('now'))""",gas_fees_data)
-        except Exception as e:
-            print(f'Failed to save gas fees data to db - {gas_fees_data}, Error - {e}') 
-    
-    def get_latest_gas_fees(self):
-        self.cursor.execute("""select * from gas_fees
-                                group by source, created_at
-                                order by  created_at DESC LIMIT 2""")
+        _gas_fees_data = {**gas_fees_data, 'id':str(uuid.uuid4()), 'created_at':datetime.now()}
+        self._db.append(_gas_fees_data)
 
-        res = self.cursor.fetchall()
+    def get_latest_gas_fees(self, sources, time_interval):
+        result = {}
 
-        print(f'latest gas fees {res}')
+        for source in sources:
+            result[source] = {}
 
-        return res
+        now = datetime.now()
+        
+        for row in self._db:
+            source = row['source']
+            time_diff = now - row['created_at']
+
+            time_diff_in_hrs = divmod(time_diff.total_seconds(), 3600)[0]
+
+            if time_diff_in_hrs > time_interval:
+                continue
+            
+            for field in self._fields:
+                if (field not in result[source]) or (result[source][field] > row[field]):
+                    result[source][field]= row[field]
+        return result
+
+
+
 
     def get_all_gas_fees(self):
-        self.cursor.execute('select * from gas_fees')
-        res = self.cursor.fetchall()
-        print(f'all gas fees stored - {res}')
-
-        return res
-        
+        return self._db

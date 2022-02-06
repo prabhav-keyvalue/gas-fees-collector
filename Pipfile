@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 requests-html = "*"
 python-dotenv = "*"
+slack-sdk = "*"
+prettytable = "*"
 
 [dev-packages]
 
