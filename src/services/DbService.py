@@ -36,6 +36,21 @@ class DbService(metaclass=Singleton):
         return result
 
 
+    def delete_old_rows(self, time_interval):
+
+        new_db = []
+        now = datetime.now()
+
+        for row in self._db:
+            time_diff = now - row['created_at']
+
+            time_diff_in_hrs = divmod(time_diff.total_seconds(), 3600)[0]
+
+            if time_diff_in_hrs <= time_interval:
+                new_db.append(row)
+
+        self._db = new_db
+
 
 
     def get_all_gas_fees(self):

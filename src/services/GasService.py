@@ -28,3 +28,7 @@ class GasService:
 
     def get_all_gas_fees(self):
         return self.db_service.get_all_gas_fees()
+
+    def delete_old_rows(self, time_interval):
+        print(f'deleting gas fees enteries older than {time_interval}hrs')
+        self.db_service.delete_old_rows(time_interval)

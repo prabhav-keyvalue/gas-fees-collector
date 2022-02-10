@@ -25,3 +25,4 @@ class ScraperRoutineService(BaseRoutineService):
             res = self.gas_service.get_latest_gas_fees(self._scrapers, time_interval)
             slack_message = self.gas_service.build_slack_message(res, time_interval)
             self.slack_service.send_message(slack_message, self._slack_channel)
+        self.gas_service.delete_old_rows(max(self._time_intervals))
