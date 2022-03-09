@@ -20,9 +20,16 @@ class ScraperRoutineService(BaseRoutineService):
     
 
     def task(self):
-        self.gas_service.fetch_and_save_gas_fees()
-        for time_interval in self._time_intervals:
-            res = self.gas_service.get_latest_gas_fees(self._scrapers, time_interval)
-            slack_message = self.gas_service.build_slack_message(res, time_interval)
-            self.slack_service.send_message(slack_message, self._slack_channel)
-        self.gas_service.delete_old_rows(max(self._time_intervals))
+
+        try:
+            self.gas_service.fetch_and_save_gas_fees()
+            for time_interval in self._time_intervals:
+                res = self.gas_service.get_latest_gas_fees(self._scrapers, time_interval)
+                slack_message = self.gas_service.build_slack_message(res, time_interval)
+                self.slack_service.send_message(slack_message, self._slack_channel)
+            self.gas_service.delete_old_rows(max(self._time_intervals))
+        except Exception as e:
+            print(f'Scraping failed Error: {e}')
+            self.slack_service.send_message(f'Scraping failed. Error - {e}', self._slack_channel)
+
+        

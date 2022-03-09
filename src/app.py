@@ -8,16 +8,6 @@ load_dotenv()
 
 
 def main():
-    # test = EtherScanScraper()
-    # test.scrape_gas_fees()
-
-    # test2 = MyCryptoScraper()
-
-    # t = test2.scrape_gas_fees()
-
-    # print(t)
-
-    # GasService().fetch_and_save_gas_fees()
 
     scraper_routine_service = ScraperRoutineService()
     scraper_routine_service.start()

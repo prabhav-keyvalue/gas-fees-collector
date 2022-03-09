@@ -15,7 +15,7 @@ class EtherScanScraper(BaseScraper):
         high_price = html.find('#spanHighPrice', first=True).text
         
         return {
-            'low_price':low_price,
-            'average_price':average_price,
-            'high_price':high_price
+            'low_price':float(low_price),
+            'average_price':float(average_price),
+            'high_price':float(high_price)
         }

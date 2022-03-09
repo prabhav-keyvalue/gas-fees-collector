@@ -13,7 +13,7 @@ class MyCryptoScraper(BaseScraper):
     def map_gas_fees(self, html):
         price_info = ast.literal_eval(html.text)
         return {
-            'low_price': price_info['safeLow'],
-            'average_price': price_info['standard'],
-            'high_price': price_info['fast']
+            'low_price': float(price_info['safeLow']),
+            'average_price': float(price_info['standard']),
+            'high_price': float(price_info['fast'])
         }
